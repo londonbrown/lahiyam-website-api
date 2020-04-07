@@ -32,8 +32,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource:
-        - 'Fn::ImportValue': ${self:custom.resourcesStage}-lahiyam*
+      Resource: arn:aws:dynamodb:*:*:table/${self:custom.resourcesStage}-lahiyam*
 
 functions:
   hello:
