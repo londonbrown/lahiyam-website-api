@@ -23,4 +23,5 @@ artifacts:
   files:
     - services/**/target/**/*
     - services/**/serverless.yml
+    - serverless.common.yml
     - deploy.sh
