@@ -8,12 +8,18 @@ phases:
   pre_build:
     commands:
       - npm install --silent --no-progress
+      - cd $CODEBUILD_SRC_DIR/services/lahiyam-website && npm install --silent --no-progress
+      # - cd $CODEBUILD_SRC_DIR/services/blog-api && npm install --silent --no-progress
   build:
     commands:
-      - echo "Build - not yet implemented..."
+      - npm run test
+      - mkdir -p target/dev
+      - mkdir target/prod
+      - npm run package-lahiyam-website
+      # - npm run package-all
 
 artifacts:
   files:
-    - target/**/*
-    - serverless.yml
+    - services/**/target/**/*
+    - services/**/serverless.yml
     - deploy.sh

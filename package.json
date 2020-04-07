@@ -1,0 +1,30 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "dependencies": {
+    "aws-xray-sdk": "^2.5.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.655.0",
+    "serverless-bundle": "^1.3.3",
+    "serverless-offline": "^6.1.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lahiyam/lahiyam-website-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lahiyam/lahiyam-website-api/issues"
+  },
+  "homepage": "https://github.com/lahiyam/lahiyam-website-api#readme",
+  "private": true,
+  "scripts": {
+    "package-lahiyam-website-dev": "cd services/lahiyam-website && serverless package --package target/dev --stage dev -v",
+    "package-lahiyam-website-prod": "cd services/lahiyam-website && serverless package --package target/prod --stage prod -v",
+    "package-blog-api-dev": "cd services/blog-api && serverless package --package target/dev --stage dev -v",
+    "package-blog-api-prod": "cd services/blog-api && serverless package --package target/prod --stage prod -v",
+    "package-lahiyam-website": "npm run package-lahiyam-website-dev && npm run package-lahiyam-website-prod",
+    "package-blog-api": "npm run package-blog-api-dev && npm run package-blog-api-prod",
+    "package-all": "npm run package-lahiyam-website && npm run package-blog-api"
+  }
+}
