@@ -29,7 +29,7 @@ provider:
   apiGateway:
     restApiId:
       "Fn::ImportValue": ${self:custom.stage}-lahiyam-website-rest-api-id
-    restApiRoutResourceId:
+    restApiRootResourceId:
       "Fn::ImportValue": ${self:custom.stage}-lahiyam-website-rest-api-root-resource-id
 
   environment:
