@@ -24,3 +24,5 @@ artifacts:
     - services/**/serverless.yml
     - serverless.common.yml
     - deploy.sh
+    - package.json
+    - services/**/package.json
