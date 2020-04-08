@@ -1,7 +1,6 @@
 #! /bin/bash
-npm install -g serverless
-npm install
+npm install --save
 cd $CODEBUILD_SRC_DIR/services/$service || exit
-npm install
+npm install --save
 serverless deploy --stage $env --package \
 $CODEBUILD_SRC_DIR/services/$service/target/$env -v -r $AWS_REGION
