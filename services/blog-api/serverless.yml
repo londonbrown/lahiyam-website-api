@@ -1,0 +1,69 @@
+service:
+  name: lahiyam-website-blog
+
+custom:
+  stage: ${file(../../serverless.common.yml):custom.stage}
+  resourcesStages: ${file(../../serverless.common.yml):custom.resourcesStages}
+  resourcesStage: ${file(../../serverless.common.yml):custom.resourcesStage}
+  webpack:
+    webpackConfig: "webpack.config.js"
+    includeModules:
+      forceExclude:
+        - aws-sdk
+package:
+  individually: true
+
+plugins:
+  - serverless-webpack
+  - serverless-mocha-plugin
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  timeout: 5
+  stage: dev
+  tracing:
+    lambda: true
+
+  apiGateway:
+    restApiId:
+      "Fn::ImportValue": ${self:custom.stage}-lahiyam-website-rest-api-id
+    restApiRoutResourceId:
+      "Fn::ImportValue": ${self:custom.stage}-lahiyam-website-rest-api-root-resource-id
+
+  environment:
+    stage: ${self:custom.stage}
+    resourcesStage: ${self:custom.stage}
+
+  iamRoleStatements:
+    - ${file(../../serverless.common.yml):lambdaPolicyXRay}
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: arn:aws:dynamodb:*:*:table/${self:custom.resourcesStage}-lahiyam*
+
+functions:
+  user:
+    handler: handlers/UserHandler.index
+    events:
+      - http:
+          path: user
+          method: ANY
+          cors: true
+          authorizer: aws_iam
+
+  post:
+    handler: handlers/PostHandler.index
+    events:
+      - http:
+          path: post
+          method: ANY
+          cors: true
+          authorizer: aws_iam

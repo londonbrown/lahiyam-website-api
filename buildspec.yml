@@ -9,15 +9,14 @@ phases:
     commands:
       - npm install --silent --no-progress
       - cd $CODEBUILD_SRC_DIR/services/lahiyam-website && npm install --silent --no-progress
-      # - cd $CODEBUILD_SRC_DIR/services/blog-api && npm install --silent --no-progress
+      - cd $CODEBUILD_SRC_DIR/services/blog-api && npm install --silent --no-progress
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR
       - npm run test
       - mkdir -p target/dev
       - mkdir target/prod
-      - npm run package-lahiyam-website
-      # - npm run package-all
+      - npm run package-all
 
 artifacts:
   files:
