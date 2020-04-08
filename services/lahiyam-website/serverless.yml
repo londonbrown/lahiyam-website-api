@@ -45,6 +45,8 @@ functions:
           authorizer: aws_iam
 
 resources:
+  - ${file(resources/api-gateway-errors.yml)}
+  - ${file(resources/cognito-policy.yml)}
   - Outputs:
       ApiGatewayRestApiId:
         Value:
