@@ -67,7 +67,6 @@ functions:
           path: user
           method: GET
           cors: true
-          origin: "*.lahiyam.com"
 
   post:
     handler: handlers/PostHandler.index
@@ -76,7 +75,6 @@ functions:
           path: post
           method: GET
           cors: true
-          origin: "*.lahiyam.com"
       - http:
           path: post
           method: POST
