@@ -12,6 +12,10 @@ import DevOrigins from "../libs/enum/DevOrigins";
 const postRequest = new PostRequest(DynamoDBMapper);
 const s3ImageManager = new S3ImageManager(S3Client);
 export const index: APIGatewayProxyHandler = async (event, _context) => {
+  if (event.hasOwnProperty("headers") === false) {
+    event.headers = {};
+  }
+  event.headers.Origin = "http://localhost:3001";
   const allowedOrigin =
     process.env.stage === "prod"
       ? ProdOrigins.API
