@@ -6,11 +6,16 @@ import S3ImageManager from "./util/S3ImageManager";
 import { APIGatewayProxyHandler } from "aws-lambda";
 import "source-map-support/register";
 import { Response, ResponseBuilder } from "./util/ResponseBuilder";
+import ProdOrigins from "../libs/enum/ProdOrigins";
+import DevOrigins from "../libs/enum/DevOrigins";
 
 const postRequest = new PostRequest(DynamoDBMapper);
 const s3ImageManager = new S3ImageManager(S3Client);
 export const index: APIGatewayProxyHandler = async (event, _context) => {
-  //console.log(event);
+  const allowedOrigin =
+    process.env.stage === "prod"
+      ? ProdOrigins.API
+      : DevOrigins.getAllowedOriginFromEvent(event);
   try {
     const { httpMethod } = event;
     let queryEvent;
@@ -20,28 +25,38 @@ export const index: APIGatewayProxyHandler = async (event, _context) => {
         const { queryStringParameters } = event;
         if (queryStringParameters.id || queryStringParameters.userId) {
           queryEvent = await getPost(event);
-          response = ResponseBuilder.successfulResponse(queryEvent);
+          response = ResponseBuilder.successfulResponse(queryEvent)
+            .withOrigin(allowedOrigin)
+            .build();
         }
       }
     } else if (httpMethod.toLocaleUpperCase() === "PUT") {
       const body = JSON.parse(event.body);
       queryEvent = await updatePost(body);
-      response = ResponseBuilder.successfulResponse(queryEvent);
+      response = ResponseBuilder.successfulResponse(queryEvent)
+        .withOrigin(allowedOrigin)
+        .build();
     } else if (httpMethod.toLocaleUpperCase() === "POST") {
       const body = JSON.parse(event.body);
       queryEvent = await createPost(body);
-      response = ResponseBuilder.successfulResponse(queryEvent);
+      response = ResponseBuilder.successfulResponse(queryEvent)
+        .withOrigin(allowedOrigin)
+        .build();
     } else {
       response = ResponseBuilder.errorResponse({
         message:
           "Invalid request type. Acceptable requests are GET, POST, PUT, and DELETE"
-      });
+      })
+        .withOrigin(allowedOrigin)
+        .build();
     }
     console.log(response.getResponseObject());
     return response.getResponseObject();
   } catch (e) {
     console.error(e);
-    let response = ResponseBuilder.errorResponse(e);
+    let response = ResponseBuilder.errorResponse(e)
+      .withOrigin(allowedOrigin)
+      .build();
     return response.getResponseObject();
   }
 };

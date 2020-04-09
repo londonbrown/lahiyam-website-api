@@ -1,8 +1,4 @@
 export class Response {
-  static ALLOW_ORIGIN_AND_CREDS = {
-    "Access-Control-Allow-Origin": "google.com",
-    "Access-Control-Allow-Credentials": true
-  };
   statusCode: number;
   body: string;
   headers: any;
@@ -25,18 +21,10 @@ export class ResponseBuilder {
   private _body: string;
   private _headers: any;
   static successfulResponse(body: any) {
-    return new ResponseBuilder()
-      .withBody(body)
-      .withStatusCode(200)
-      .withHeaders(Response.ALLOW_ORIGIN_AND_CREDS)
-      .build();
+    return new ResponseBuilder().withBody(body).withStatusCode(200);
   }
   static errorResponse(body: any) {
-    return new ResponseBuilder()
-      .withBody(body)
-      .withStatusCode(400)
-      .withHeaders(Response.ALLOW_ORIGIN_AND_CREDS)
-      .build();
+    return new ResponseBuilder().withBody(body).withStatusCode(400);
   }
 
   withStatusCode(statusCode: number) {
@@ -51,7 +39,14 @@ export class ResponseBuilder {
     }
     return this;
   }
-  withHeaders(headers: any) {
+  withOrigin(origin: string) {
+    return this.withHeaders({
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Credentials": true,
+      Vary: "Origin"
+    });
+  }
+  private withHeaders(headers: any) {
     this._headers = headers;
     return this;
   }
