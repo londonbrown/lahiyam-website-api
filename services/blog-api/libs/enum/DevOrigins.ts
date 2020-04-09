@@ -5,7 +5,7 @@ enum DevOrigins {
 
 namespace DevOrigins {
   export function getAllowedOriginFromEvent(event: any) {
-    let origin = event.headers.Host;
+    let origin = event.headers.Origin;
     if (origin in DevOrigins) {
       return origin;
     } else {
