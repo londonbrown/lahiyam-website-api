@@ -1,4 +1,4 @@
 enum ProdOrigins {
-  API = "lahiyam.com"
+  API = "https://lahiyam.com"
 }
 export default ProdOrigins;
