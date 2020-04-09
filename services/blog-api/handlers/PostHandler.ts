@@ -5,6 +5,7 @@ import S3ImageManager from "./util/S3ImageManager";
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import "source-map-support/register";
+import { Response, ResponseBuilder } from "./util/ResponseBuilder";
 
 const postRequest = new PostRequest(DynamoDBMapper);
 const s3ImageManager = new S3ImageManager(S3Client);
@@ -12,39 +13,34 @@ export const index: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const { httpMethod } = event;
     let queryEvent;
+    let response: Response;
     if (httpMethod.toLocaleUpperCase() === "GET") {
       if (event.queryStringParameters) {
         const { queryStringParameters } = event;
         if (queryStringParameters.id || queryStringParameters.userId) {
           queryEvent = await getPost(event);
+          response = ResponseBuilder.successfulResponse(queryEvent);
         }
       }
     } else if (httpMethod.toLocaleUpperCase() === "PUT") {
       const body = JSON.parse(event.body);
       queryEvent = await updatePost(body);
+      response = ResponseBuilder.successfulResponse(queryEvent);
     } else if (httpMethod.toLocaleUpperCase() === "POST") {
       const body = JSON.parse(event.body);
-      console.log(PostRequest.TAG, body);
       queryEvent = await createPost(body);
+      response = ResponseBuilder.successfulResponse(queryEvent);
     } else {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message:
-            "Invalid request type. Acceptable requests are GET, POST, PUT, and DELETE"
-        })
-      };
+      response = ResponseBuilder.errorResponse({
+        message:
+          "Invalid request type. Acceptable requests are GET, POST, PUT, and DELETE"
+      });
     }
-    return {
-      statusCode: 200,
-      body: JSON.stringify(queryEvent)
-    };
+    return response.getResponseObject();
   } catch (e) {
     console.error(e);
-    return {
-      statusCode: 400,
-      body: JSON.stringify(e)
-    };
+    let response = ResponseBuilder.errorResponse(e);
+    return response.getResponseObject();
   }
 };
 
@@ -98,8 +94,8 @@ async function createPost(body) {
 }
 
 async function uploadPhotosFromPost(post: Post) {
-  const content = JSON.parse(post.content);
-  if (typeof content === "object") {
+  if (typeof post.content === "object") {
+    const content = JSON.parse(post.content);
     content.ops = content.ops.map(op => {
       if (op.hasOwnProperty("insert") && op.insert.hasOwnProperty("image")) {
         op.insert.image =

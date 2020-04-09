@@ -3,6 +3,7 @@ import DynamoDBMapper from "../libs/db/DynamoDBMapper";
 
 import { APIGatewayProxyHandler } from "aws-lambda";
 import "source-map-support/register";
+import { Response, ResponseBuilder } from "./util/ResponseBuilder";
 
 const userRequest = new UserRequest(DynamoDBMapper);
 
@@ -11,29 +12,24 @@ export const index: APIGatewayProxyHandler = async (event, _context) => {
     const { httpMethod } = event;
 
     let queryEvent;
+    let response: Response;
     if (httpMethod.toLocaleUpperCase() === "GET") {
       queryEvent = await getUser(event);
+      response = ResponseBuilder.successfulResponse(queryEvent);
     } else if (httpMethod.toLocaleUpperCase() === "POST") {
       const body = JSON.parse(event.body);
       queryEvent = await createUser(body);
+      response = ResponseBuilder.successfulResponse(queryEvent);
     } else {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message:
-            "Invalid request type. Acceptable requests are GET, POST, PUT, and DELETE"
-        })
-      };
+      response = ResponseBuilder.errorResponse({
+        message:
+          "Invalid request type. Acceptable requests are GET, POST, and PUT"
+      });
     }
-    return {
-      statusCode: 200,
-      body: JSON.stringify(queryEvent)
-    };
+    return response.getResponseObject();
   } catch (e) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify(e)
-    };
+    let response = ResponseBuilder.errorResponse(e);
+    return response.getResponseObject();
   }
 };
 
