@@ -55,15 +55,35 @@ functions:
     events:
       - http:
           path: user
-          method: ANY
+          method: POST
           cors: true
           authorizer: aws_iam
+      - http:
+          path: user
+          method: PUT
+          cors: true
+          authorizer: aws_iam
+      - http:
+          path: user
+          method: GET
+          cors: true
+          origin: "*.lahiyam.com"
 
   post:
     handler: handlers/PostHandler.index
     events:
       - http:
           path: post
-          method: ANY
+          method: GET
+          cors: true
+          origin: "*.lahiyam.com"
+      - http:
+          path: post
+          method: POST
+          cors: true
+          authorizer: aws_iam
+      - http:
+          path: post
+          method: PUT
           cors: true
           authorizer: aws_iam

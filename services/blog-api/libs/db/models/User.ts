@@ -4,7 +4,9 @@ import {
   table
 } from "@aws/dynamodb-data-mapper-annotations";
 
-@table("users")
+const stage = process.env.stage === "prod" ? "prod" : "dev";
+
+@table(`${stage}-lahiyam-users-table`)
 export default class User {
   @hashKey()
   id: string;
