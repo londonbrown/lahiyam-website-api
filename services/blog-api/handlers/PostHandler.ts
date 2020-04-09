@@ -10,6 +10,7 @@ import { Response, ResponseBuilder } from "./util/ResponseBuilder";
 const postRequest = new PostRequest(DynamoDBMapper);
 const s3ImageManager = new S3ImageManager(S3Client);
 export const index: APIGatewayProxyHandler = async (event, _context) => {
+  //console.log(event);
   try {
     const { httpMethod } = event;
     let queryEvent;
@@ -36,6 +37,7 @@ export const index: APIGatewayProxyHandler = async (event, _context) => {
           "Invalid request type. Acceptable requests are GET, POST, PUT, and DELETE"
       });
     }
+    console.log(response.getResponseObject());
     return response.getResponseObject();
   } catch (e) {
     console.error(e);

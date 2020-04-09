@@ -1,6 +1,6 @@
 export class Response {
   static ALLOW_ORIGIN_AND_CREDS = {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": "google.com",
     "Access-Control-Allow-Credentials": true
   };
   statusCode: number;
