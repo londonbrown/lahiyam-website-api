@@ -1,5 +1,5 @@
 import { DataMapper } from "@aws/dynamodb-data-mapper/build/DataMapper";
-import { greaterThanOrEqualTo } from "@aws/dynamodb-expressions";
+import { lessThanOrEqualTo } from "@aws/dynamodb-expressions";
 import Post from "../db/models/Post";
 
 const uuid = require("uuid/v4");
@@ -30,31 +30,43 @@ export default class PostRequest {
     }
   }
 
-  async getPostsByUser(
-    userId: string,
-    createdAt?: number
-  ): Promise<Array<Post>> {
-    const thirtyDaysMS = 2592000000;
-    createdAt = Number(createdAt ? createdAt : Date.now() - thirtyDaysMS);
+  async getPostsByUser(params: {
+    userId: string;
+    createdAt?: number;
+    startKey?: string;
+  }): Promise<{
+    posts: Post[];
+    lastEvaluatedKey: Partial<Post>;
+  }> {
+    let { userId, createdAt, startKey } = params;
+    let lastEvaluatedKey;
     try {
-      let posts = new Array<Post>();
-      for await (const post of this.dynamoDBMapper.query(
-        Post,
-        {
-          userId: userId,
-          createdAt: greaterThanOrEqualTo(createdAt)
-        },
-        {
-          indexName: "userId-createdAt-index",
-          limit: 10
-        }
-      )) {
-        if (post.tags) {
-          post.tags = Array.from(post.tags);
-        }
-        posts.push(post);
-      }
-      return posts.reverse();
+      lastEvaluatedKey = JSON.parse(startKey);
+    } catch (e) {
+      console.error(e);
+    }
+    createdAt = createdAt || Date.now();
+    try {
+      let queryPaginator = this.dynamoDBMapper
+        .query(
+          Post,
+          {
+            userId: userId,
+            createdAt: lessThanOrEqualTo(createdAt)
+          },
+          {
+            indexName: "userId-createdAt-index",
+            scanIndexForward: false,
+            limit: 10,
+            startKey: lastEvaluatedKey
+          }
+        )
+        .pages();
+      let posts = (await queryPaginator.next()).value;
+      return {
+        posts: posts,
+        lastEvaluatedKey: queryPaginator.lastEvaluatedKey
+      };
     } catch (e) {
       console.error(PostRequest.TAG, "An error occurred", e);
       return null;

@@ -65,10 +65,7 @@ async function getPost(event): Promise<any> {
   if (event.queryStringParameters.hasOwnProperty("id")) {
     return postRequest.getPost(event.queryStringParameters.id);
   } else if (event.queryStringParameters.hasOwnProperty("userId")) {
-    return postRequest.getPostsByUser(
-      event.queryStringParameters.userId,
-      event.queryStringParameters.createdAt
-    );
+    return postRequest.getPostsByUser(event.queryStringParameters);
   } else {
     throw PostRequest.TAG + "GET /post expects an id or userId parameter";
   }
