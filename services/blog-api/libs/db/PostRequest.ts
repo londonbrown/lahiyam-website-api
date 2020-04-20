@@ -41,7 +41,9 @@ export default class PostRequest {
     let { userId, createdAt, startKey } = params;
     let lastEvaluatedKey;
     try {
-      lastEvaluatedKey = JSON.parse(startKey);
+      if (startKey) {
+        lastEvaluatedKey = JSON.parse(startKey);
+      }
     } catch (e) {
       console.error(e);
     }
