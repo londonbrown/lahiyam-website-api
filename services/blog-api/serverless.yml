@@ -85,3 +85,21 @@ functions:
           method: PUT
           cors: true
           authorizer: aws_iam
+
+  sitePreferences:
+    handler: handlers/SitePreferencesHandler.index
+    events:
+      - http:
+          path: preference
+          method: GET
+          cors: true
+      - http:
+          path: preference
+          method: POST
+          cors: true
+          authorizer: aws_iam
+      - http:
+          path: preference
+          method: PUT
+          cors: true
+          authorizer: aws_iam
