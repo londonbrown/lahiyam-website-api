@@ -1,3 +1,4 @@
+import "source-map-support/register";
 import { APIGatewayProxyHandler } from "aws-lambda";
 import ProdOrigins from "../libs/enum/ProdOrigins";
 import DevOrigins from "../libs/enum/DevOrigins";
