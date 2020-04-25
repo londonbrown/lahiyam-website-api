@@ -2,8 +2,7 @@
   "name": "api",
   "version": "1.0.0",
   "dependencies": {
-    "aws-xray-sdk": "^2.5.0",
-    "serverless-webpack": "^5.3.1"
+    "aws-xray-sdk": "^2.5.0"
   },
   "devDependencies": {
     "aws-sdk": "^2.655.0",
