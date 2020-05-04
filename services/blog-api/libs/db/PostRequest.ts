@@ -13,11 +13,12 @@ export default class PostRequest {
     this.dynamoDBMapper = dynamoDBMapper;
   }
 
-  async getPost(id: string): Promise<Post> {
+  async getPost(params: { id: string; status?: PostStatus }): Promise<Post> {
     try {
       let post = await this.dynamoDBMapper.get(
         Object.assign(new Post(), {
-          id: id
+          id: params.id,
+          status: params.status
         })
       );
       if (post.tags) {

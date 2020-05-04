@@ -63,7 +63,7 @@ export const index: APIGatewayProxyHandler = async (event, _context) => {
 
 async function getPost(event): Promise<any> {
   if (event.queryStringParameters.hasOwnProperty("id")) {
-    return postRequest.getPost(event.queryStringParameters.id);
+    return postRequest.getPost(event.queryStringParameters);
   } else if (event.queryStringParameters.hasOwnProperty("userId")) {
     return postRequest.getPostsByUser(event.queryStringParameters);
   } else {
