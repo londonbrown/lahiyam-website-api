@@ -1,6 +1,7 @@
 import { DataMapper } from "@aws/dynamodb-data-mapper/build/DataMapper";
-import { lessThanOrEqualTo } from "@aws/dynamodb-expressions";
+import { lessThanOrEqualTo, equals } from "@aws/dynamodb-expressions";
 import Post from "../db/models/Post";
+import PostStatus from "../enum/PostStatus";
 
 const uuid = require("uuid/v4");
 
@@ -34,6 +35,7 @@ export default class PostRequest {
     userId: string;
     createdAt?: number;
     startKey?: string;
+    status?: PostStatus;
   }): Promise<{
     posts: Post[];
     lastEvaluatedKey: Partial<Post>;
@@ -49,6 +51,17 @@ export default class PostRequest {
     }
     createdAt = createdAt || Date.now();
     try {
+      params.status = params.status || PostStatus.ACTIVE;
+      let queryOptions = {
+        indexName: "userId-createdAt-index",
+        scanIndexForward: false,
+        limit: 10,
+        startKey: lastEvaluatedKey,
+        filter: {
+          ...equals(params.status),
+          subject: "status"
+        }
+      };
       let queryPaginator = this.dynamoDBMapper
         .query(
           Post,
@@ -56,12 +69,7 @@ export default class PostRequest {
             userId: userId,
             createdAt: lessThanOrEqualTo(createdAt)
           },
-          {
-            indexName: "userId-createdAt-index",
-            scanIndexForward: false,
-            limit: 10,
-            startKey: lastEvaluatedKey
-          }
+          queryOptions
         )
         .pages();
       let posts = (await queryPaginator.next()).value;

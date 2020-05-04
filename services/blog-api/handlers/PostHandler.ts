@@ -95,15 +95,10 @@ async function createPost(body) {
   } else if (!body.hasOwnProperty("content")) {
     throw Error("POST /post content attribute not specified in request");
   }
-  const post = new Post();
-  post.userId = body.userId;
-  post.title = body.title;
-  post.content = body.content;
-  post.tags = body.tags;
-  post.createdAt = body.createdAt;
   // check for and upload photos to s3, then replace image links.
   // or just return original content if not photos
-  post.content = await uploadPhotosFromPost(post);
+  body.content = await uploadPhotosFromPost(body);
+  const post = new Post(body);
   return postRequest.createPost(post);
 }
 
