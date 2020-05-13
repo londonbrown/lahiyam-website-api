@@ -1,5 +1,5 @@
 import { DataMapper } from "@aws/dynamodb-data-mapper/build/DataMapper";
-import { lessThanOrEqualTo, equals } from "@aws/dynamodb-expressions";
+import { equals, lessThanOrEqualTo } from "@aws/dynamodb-expressions";
 import Post from "../db/models/Post";
 import PostStatus from "../enum/PostStatus";
 
@@ -13,7 +13,8 @@ export default class PostRequest {
     this.dynamoDBMapper = dynamoDBMapper;
   }
 
-  async getPost(params: { id: string; status?: PostStatus }): Promise<Post> {
+  async getPost(params: { id: string; status?: string }): Promise<Post> {
+    console.log(params);
     try {
       let post = await this.dynamoDBMapper.get(
         Object.assign(new Post(), {
@@ -56,7 +57,8 @@ export default class PostRequest {
       let queryOptions = {
         indexName: "userId-createdAt-index",
         scanIndexForward: false,
-        limit: 10,
+        consistentRead: false,
+        limit: params.status === PostStatus.ACTIVE ? 15 : undefined,
         startKey: lastEvaluatedKey,
         filter: {
           ...equals(params.status),
@@ -73,6 +75,7 @@ export default class PostRequest {
           queryOptions
         )
         .pages();
+      console.log(queryOptions);
       let posts = (await queryPaginator.next()).value;
       return {
         posts: posts,
@@ -102,7 +105,12 @@ export default class PostRequest {
 
   async updatePost(post: Post) {
     if (PostRequest.verifyPostObject(post)) {
-      let existingPost = await this.getPost(post.id);
+      let existingPost = await this.getPost({
+        id: post.id,
+        status: post.status
+          ? post.status.toString()
+          : PostStatus.ACTIVE.toString()
+      });
       if (existingPost == null) {
         throw "Post does not exist with provided id";
       }
@@ -111,10 +119,10 @@ export default class PostRequest {
       }
       for (let attr of Object.keys(post)) {
         existingPost[attr] = post[attr];
-        console.log(typeof existingPost[attr]);
-        console.log(typeof post[attr]);
+        // console.log(typeof existingPost[attr]);
+        // console.log(typeof post[attr]);
       }
-      console.log(existingPost);
+      //console.log(existingPost);
       return this.savePost(existingPost);
     }
   }

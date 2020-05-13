@@ -81,7 +81,6 @@ async function updatePost(body) {
   }
   const post = new Post();
   for (let attr of Object.keys(body)) {
-    console.log(typeof body[attr]);
     post[attr] = body[attr];
   }
   return postRequest.updatePost(post);
