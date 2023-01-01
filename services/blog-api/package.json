@@ -15,7 +15,7 @@
     "mocha": "^7.1.1",
     "serverless-mocha-plugin": "^1.12.0",
     "webpack-node-externals": "^1.7.2",
-    "ts-loader": "^6.2.2"
+    "ts-loader": "^9.4.2"
   },
   "scripts": {
     "offline": "set IS_LOCAL=true && serverless offline start",
